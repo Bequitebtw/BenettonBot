@@ -5,7 +5,7 @@ from aiogram import Bot,Dispatcher
 from dotenv import load_dotenv
 import os
 load_dotenv()
-from apps import handlers, feedback
+from apps import handlers
 bot = Bot(os.getenv('TOKEN'))
 dp = Dispatcher()
 

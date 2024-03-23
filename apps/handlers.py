@@ -3,13 +3,13 @@ from aiogram.types import CallbackQuery
 from aiogram.types import FSInputFile
 from aiogram import Router, F
 from aiogram.types import Message
-from aiogram.filters import Command
 from apps.lists import pko_list
 from apps.lists import KM3_list
 from contextlib import suppress
 from aiogram.exceptions import TelegramBadRequest
-from apps.lists import delete_list
-
+from dotenv import load_dotenv
+import os
+load_dotenv()
 
 # Клавиатура пользователя
 import keyboards.user_keyboard as kb
@@ -18,7 +18,11 @@ import keyboards.user_keyboard as kb
 import keyboards.admin_keyboard as ak
 from filters.is_admin import IsAdmin
 
-admins_id = [804555908,856935419]
+ME = os.getenv('ADMIN_ME')
+KATE = os.getenv('ADMIN_KATE')
+
+admins_id = [int(ME),int(KATE)]
+
 router = Router()
 
 # Старт бота
