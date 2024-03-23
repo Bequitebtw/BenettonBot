@@ -31,15 +31,6 @@ Start = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text='🎁 Gifts',url='https://t.me/BenettonShopStoreBot')
 ]])
 
-
-#PKO ВЫБОР НАВЫКОВ
-PkoInsideButtons = ReplyKeyboardMarkup(keyboard=[
-    [KeyboardButton(text="Я профи(РКО)"),KeyboardButton(text="Я новичок(РКО)")],
-    [KeyboardButton(text="Меню")]
-
-],resize_keyboard=True)
-
-
 # Пагинаторы
 class Pagination(CallbackData, prefix="pag"):
     action: str
@@ -48,16 +39,10 @@ class Pagination(CallbackData, prefix="pag"):
 
 def PkoPaginator(page: int=0):
     builder = InlineKeyboardBuilder()
-    builder.row(InlineKeyboardButton(text="⬅️",callback_data=Pagination(action = "prev",page = page).pack()),
-                InlineKeyboardButton(text="➡️", callback_data=Pagination(action="next", page=page).pack()),
-                width=2
-    )
+    builder.row(InlineKeyboardButton(text="➡️", callback_data=Pagination(action="next", page=page).pack()))
     return builder.as_markup()
 
 def Km3Paginator(page: int=0):
     builder = InlineKeyboardBuilder()
-    builder.row(InlineKeyboardButton(text="⬅️",callback_data=Pagination(action = "prev1",page = page).pack()),
-                InlineKeyboardButton(text="➡️", callback_data=Pagination(action="next1", page=page).pack()),
-                width=2
-    )
+    builder.row(InlineKeyboardButton(text="➡️", callback_data=Pagination(action="next1", page=page).pack()))
     return builder.as_markup()

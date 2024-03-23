@@ -12,7 +12,7 @@ dp = Dispatcher()
 # Функция запуска бота
 async def run():
     await bot.delete_webhook(drop_pending_updates=True)
-    dp.include_routers(handlers.router, feedback.router)
+    dp.include_routers(handlers.router)
     await dp.start_polling(bot)
 
 
