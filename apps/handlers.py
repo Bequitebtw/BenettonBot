@@ -23,14 +23,20 @@ router = Router()
 
 # Старт бота
 
-@router.message(CommandStart())
+# 1. Админ
+@router.message(CommandStart(),IsAdmin(admins_id))
 async def start_command(message: Message):
-    if IsAdmin(admins_id):
         await message.answer_photo(
             photo="https://avatars.dzeninfra.ru/get-zen_doc/34175/pub_5cea2361585c2f00b5c9cb0b_5cea310a752e5b00b25b9c01/scale_1200",
             reply_markup=kb.ReplyKeyboardDocs)
-        await message.answer(text='У вас есть права администратора', reply_markup=ak.adminKeyboard)
-    else:
+        await message.answer(
+            text=f"Привет {message.from_user.first_name} , как ты уже наверное понял(a), этот бот создан для помощи в создании кассовых документов! Если будет желание ознакомиться с gift продукций, можешь перейти в бота ниже)",
+            reply_markup=ak.adminKeyboard)
+        await message.answer(text="У вас есть права администратора")
+
+# 2. Пользователь
+@router.message(CommandStart())
+async def start_command(message: Message):
         await message.answer_photo(
             photo="https://avatars.dzeninfra.ru/get-zen_doc/34175/pub_5cea2361585c2f00b5c9cb0b_5cea310a752e5b00b25b9c01/scale_1200",reply_markup=kb.ReplyKeyboardDocs)
         await message.answer(
@@ -51,13 +57,16 @@ async def id(message: Message):
     await message.answer(f'{message.from_user.id}')
 
 # Меню
+
+# 1. Админ
+@router.message(F.text == "Меню",IsAdmin(admins_id))
+async def menu(message: Message):
+    await message.answer(text='Вы вернулись в меню!', reply_markup=ak.adminKeyboard)
+
+# 2. Пользователь
 @router.message(F.text == "Меню")
 async def menu(message: Message):
-    if(IsAdmin(admins_id)):
-        await message.answer(text='Вы вернулись в меню!', reply_markup=ak.adminKeyboard)
-    else:
-        await message.answer(text='Вы вернулись в меню!', reply_markup=kb.ReplyKeyboardDocs)
-
+    await message.answer(text='Вы вернулись в меню!', reply_markup=kb.ReplyKeyboardDocs)
 
 # Кассовая книга
 @router.message(F.text == "📖 Кассовая книга")
@@ -138,12 +147,23 @@ async def docs(callback: CallbackQuery):
     await callback.answer('')
     await callback.message.answer(text='Что будем смотреть?)',reply_markup=kb.ReplyKeyboardDocs)
 
+
+
 # Админ панель
 @router.message(F.text == "Admin-panel",IsAdmin(admins_id))
 async def adminPanel(message: Message):
     await message.answer(text='Вы зашли в панель админа',reply_markup=ak.adminPanel)
 
-# Любое сообщение от пользователя + вкладка для admin
+# Любое сообщение от пользователя
+
+# 1. Админ
+@router.message(IsAdmin(admins_id))
+async def anyMess(message: Message):
+    await message.answer(
+        text="Вы вернулись в меню.")
+    await message.answer(text='Что будем смотреть?)',reply_markup=ak.adminKeyboard)
+
+# 2. Пользовател
 @router.message()
 async def anyMess(message: Message):
     await message.answer(
