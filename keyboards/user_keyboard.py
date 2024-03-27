@@ -11,7 +11,7 @@ GiftCardButtons = ReplyKeyboardMarkup(keyboard=[
 ],resize_keyboard=True)
 
 # Клавиатура внутри пунктов
-ReplyInsideButtons = ReplyKeyboardMarkup(keyboard=[
+MenuKeyboard = ReplyKeyboardMarkup(keyboard=[
     [KeyboardButton(text='Меню')]
 ],resize_keyboard=True)
 
@@ -21,7 +21,7 @@ ReturnsButtons = ReplyKeyboardMarkup(keyboard=[
 ],resize_keyboard=True)
 
 # Создание клавиатуры меню
-ReplyKeyboardDocs = ReplyKeyboardMarkup(keyboard=[
+MainButtons = ReplyKeyboardMarkup(keyboard=[
     [KeyboardButton(text="📖 Кассовая книга"),KeyboardButton(text="♻ Возвраты"),KeyboardButton(text="📄 КМ6")],
     [KeyboardButton(text="📄 КМ3"),KeyboardButton(text="📝 РКО"),KeyboardButton(text="📝 ПКО")],
     [KeyboardButton(text="💳 ПДК"),KeyboardButton(text="Главная"),KeyboardButton(text="Оставить отзыв")]
@@ -33,10 +33,10 @@ Start = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text='🎁 Gifts',url='https://t.me/BenettonShopStoreBot')
 ]])
 
-def fb(text: str| list):
+# Feedback
+def feedback(text: str | list):
     builder = ReplyKeyboardBuilder()
-    builder.adjust(2,2)
     if isinstance(text, str):
         text = [text]
     [builder.button(text=txt) for txt in text]
-    return builder.as_markup(resize_keyboard=True,one_time_keyboard=True)
+    return builder.adjust(2,2).as_markup(resize_keyboard=True,one_time_keyboard=True)
