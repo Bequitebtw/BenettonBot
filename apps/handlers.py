@@ -11,6 +11,8 @@ from dotenv import load_dotenv
 import os
 load_dotenv()
 
+from apps import pagination as pg
+
 # Клавиатура пользователя
 import keyboards.user_keyboard as kb
 
@@ -91,8 +93,8 @@ async def km6(message: Message):
 
 
 #КМ3 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-@router.callback_query(kb.Pagination.filter(F.action.in_(["next1"])))
-async def pagination_handler(call: CallbackQuery, callback_data: kb.Pagination):
+@router.callback_query(pg.Pagination.filter(F.action.in_(["next1"])))
+async def pagination_handler(call: CallbackQuery, callback_data: pg.Pagination):
     page_num = int(callback_data.page)
     page = page_num + 1
     if page_num < (len(KM3_list) - 1):
@@ -100,20 +102,20 @@ async def pagination_handler(call: CallbackQuery, callback_data: kb.Pagination):
             image = FSInputFile(KM3_list[page][0], filename="image")
             await call.message.answer_photo(photo=image)
             await call.message.answer(
-                text=f"{KM3_list[page][1]}", reply_markup=kb.Km3Paginator(page))
+                text=f"{KM3_list[page][1]}", reply_markup=pg.Km3Paginator(page))
         await call.answer()
     else:
-        await call.message.answer("Вы закончили обучение!",reply_markup=kb.ReplyKeyboardDocs)
+        await call.message.answer("Вы закончили обучение!",reply_markup=kb.ReplyInsideButtons)
 @router.message(F.text == "📄 КМ3")
 async def km3(message: Message):
     await message.answer(text='КМ3 - Акт о возврате денежных сумм покупателям (клиентам) по неиспользованным кассовым чекам',reply_markup=kb.ReplyInsideButtons)
     image = FSInputFile(KM3_list[0][0])
     await message.answer_photo(photo=image)
-    await message.answer(f"{KM3_list[0][1]}", reply_markup=kb.Km3Paginator())
+    await message.answer(f"{KM3_list[0][1]}", reply_markup=pg.Km3Paginator())
 
 # РКО ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-@router.callback_query(kb.Pagination.filter(F.action.in_(["next"])))
-async def pagination_handler(call: CallbackQuery, callback_data: kb.Pagination):
+@router.callback_query(pg.Pagination.filter(F.action.in_(["next"])))
+async def pagination_handler(call: CallbackQuery, callback_data: pg.Pagination):
     page_num = int(callback_data.page)
     page = page_num + 1
     if page_num < (len(pko_list) - 1):
@@ -121,10 +123,10 @@ async def pagination_handler(call: CallbackQuery, callback_data: kb.Pagination):
             image = FSInputFile(pko_list[page][0], filename="image")
             await call.message.answer_photo(photo=image)
             await call.message.answer(
-                text=f"{pko_list[page][1]}", reply_markup=kb.PkoPaginator(page))
+                text=f"{page + 1}" f". " f"{pko_list[page][1]}", reply_markup=pg.PkoPaginator(page))
         await call.answer()
     else:
-        await call.message.answer("Вы закончили обучение!", reply_markup=kb.ReplyKeyboardDocs)
+        await call.message.answer("Вы закончили обучение!", reply_markup=kb.ReplyInsideButtons)
 
 @router.message(F.text == "📝 РКО")
 async def rko(message: Message):
@@ -132,7 +134,7 @@ async def rko(message: Message):
                          reply_markup=kb.ReplyInsideButtons)
     image = FSInputFile(pko_list[0][0])
     await message.answer_photo(photo=image)
-    await message.answer(f"{pko_list[0][1]}", reply_markup=kb.PkoPaginator())
+    await message.answer(f"1. {pko_list[0][1]}", reply_markup=pg.PkoPaginator())
 
 
 # ПКО /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -173,3 +175,4 @@ async def anyMess(message: Message):
     await message.answer(
         text="Вы вернулись в меню.")
     await message.answer(text='Что будем смотреть?)',reply_markup=kb.ReplyKeyboardDocs)
+
