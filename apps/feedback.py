@@ -10,7 +10,6 @@ router = Router()
 @router.message(Command('feedback'))
 async def write_feedback(message: Message, state: FSMContext):
     await message.answer('Напишите отзыв по поводу бота)')
-    await state.set_state(WriteFeedback.feedback)
 
 
 async def feedback(message: Message):

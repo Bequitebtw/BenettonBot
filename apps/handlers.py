@@ -6,7 +6,12 @@ from aiogram.types import Message
 from apps.lists import pko_list
 from apps.lists import KM3_list
 from contextlib import suppress
+from aiogram.filters import Command
+from aiogram.fsm.context import FSMContext
+from utils.states import WriteFeedback
 from aiogram.exceptions import TelegramBadRequest
+from keyboards.user_keyboard import rmk
+from keyboards.user_keyboard import fb
 from dotenv import load_dotenv
 import os
 load_dotenv()
@@ -159,6 +164,34 @@ async def docs(callback: CallbackQuery):
 @router.message(F.text == "Admin-panel",IsAdmin(admins_id))
 async def adminPanel(message: Message):
     await message.answer(text='Вы зашли в панель админа',reply_markup=ak.adminPanel)
+
+#FEEDBACK STATE
+@router.message(Command('feedback'))
+async def write_feedback(message: Message, state: FSMContext):
+    await state.set_state(WriteFeedback.theme)
+    await message.answer(text="На какую тему хотите оставить отзыв?(Если нет подходящего варинта, напишите свой)",reply_markup=fb("Функционал"))
+
+@router.message(WriteFeedback.theme)
+async def themeFnc(message: Message, state: FSMContext):
+    await state.update_data(theme=message.text)
+    await state.set_state(WriteFeedback.feedback)
+    await message.answer(text="Напишите о работе бота",reply_markup=kb.rmk())
+
+@router.message(WriteFeedback.feedback)
+async def fbFnc(message: Message, state: FSMContext):
+    if len(message.text) < 10:
+        await message.answer(text="Напиши более развернутый ответ!")
+    else:
+        await state.update_data(feedback=message.text)
+        await message.answer(text="Спасибо за отзыв!", reply_markup=kb.ReplyInsideButtons)
+        data = await state.get_data()
+        await state.clear()
+        formatted_text = []
+        [
+            formatted_text.append(f"{key}: {value}")
+            for key, value in data.items()
+        ]
+        await message.answer_photo("https://business.yandex/wp-content/uploads/2022/07/doverie.png","\n".join(formatted_text))
 
 # Любое сообщение от пользователя
 
