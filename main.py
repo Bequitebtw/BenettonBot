@@ -9,6 +9,7 @@ from apps import handlers
 bot = Bot(os.getenv('TOKEN'))
 dp = Dispatcher()
 
+
 # Функция запуска бота
 async def run():
     await bot.delete_webhook(drop_pending_updates=True)

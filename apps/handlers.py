@@ -32,6 +32,8 @@ admins_id = [int(ME),int(KATE)]
 
 router = Router()
 
+feedback_list = ["Функционал","Комментарии","Скриншоты",'Меню']
+
 # Старт бота
 
 # 1. Админ
@@ -39,10 +41,10 @@ router = Router()
 async def start_command(message: Message):
         await message.answer_photo(
             photo="https://avatars.dzeninfra.ru/get-zen_doc/34175/pub_5cea2361585c2f00b5c9cb0b_5cea310a752e5b00b25b9c01/scale_1200",
-            reply_markup=kb.ReplyKeyboardDocs)
+            reply_markup=ak.adminKeyboard)
         await message.answer(
             text=f"Привет {message.from_user.first_name} , как ты уже наверное понял(a), этот бот создан для помощи в создании кассовых документов! Если будет желание ознакомиться с gift продукций, можешь перейти в бота ниже)",
-            reply_markup=ak.adminKeyboard)
+            reply_markup=kb.Start)
         await message.answer(text="У вас есть права администратора")
 
 # 2. Пользователь
@@ -95,7 +97,6 @@ async def returns(message: Message):
 @router.message(F.text == "📄 КМ6")
 async def km6(message: Message):
     await message.answer(text='КМ6 - Отчет кассира за смену.',reply_markup=kb.ReplyInsideButtons)
-
 
 #КМ3 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 @router.callback_query(pg.Pagination.filter(F.action.in_(["next1"])))
@@ -153,12 +154,9 @@ async def pdk(message: Message):
     await message.answer(text='ПДК - Подарочная карта',reply_markup=kb.GiftCardButtons)
 
 # Документы
-@router.callback_query(F.data == 'docs')
+@router.callback_query(F.data == '🎁 Gifts')
 async def docs(callback: CallbackQuery):
-    await callback.answer('')
-    await callback.message.answer(text='Что будем смотреть?)',reply_markup=kb.ReplyKeyboardDocs)
-
-
+    await callback.answer('Вы перешли по ссылке', show_alert=True)
 
 # Админ панель
 @router.message(F.text == "Admin-panel",IsAdmin(admins_id))
@@ -166,20 +164,28 @@ async def adminPanel(message: Message):
     await message.answer(text='Вы зашли в панель админа',reply_markup=ak.adminPanel)
 
 #FEEDBACK STATE
-@router.message(Command('feedback'))
+@router.message(F.text == "Оставить отзыв")
 async def write_feedback(message: Message, state: FSMContext):
     await state.set_state(WriteFeedback.theme)
-    await message.answer(text="На какую тему хотите оставить отзыв?(Если нет подходящего варинта, напишите свой)",reply_markup=fb("Функционал"))
+    await message.answer(text="Отзыв полностью анонимный!Выберите тему(если нет подходящего варинта, напишите свой)",reply_markup=fb(feedback_list))
+
 
 @router.message(WriteFeedback.theme)
 async def themeFnc(message: Message, state: FSMContext):
-    await state.update_data(theme=message.text)
-    await state.set_state(WriteFeedback.feedback)
-    await message.answer(text="Напишите о работе бота",reply_markup=kb.rmk())
+    if message.text == "Меню":
+        await state.clear()
+        await message.answer(text='Вы вернулись в меню!', reply_markup=kb.ReplyKeyboardDocs)
+    else:
+        await state.update_data(theme=message.text)
+        await state.set_state(WriteFeedback.feedback)
+        await message.answer(text="Напишите о работе бота", reply_markup=kb.ReplyInsideButtons)
 
 @router.message(WriteFeedback.feedback)
 async def fbFnc(message: Message, state: FSMContext):
-    if len(message.text) < 10:
+    if message.text == "Меню":
+        await state.clear()
+        await message.answer(text='Вы вернулись в меню!', reply_markup=kb.ReplyKeyboardDocs)
+    if len(message.text) < 1:
         await message.answer(text="Напиши более развернутый ответ!")
     else:
         await state.update_data(feedback=message.text)
@@ -187,11 +193,15 @@ async def fbFnc(message: Message, state: FSMContext):
         data = await state.get_data()
         await state.clear()
         formatted_text = []
+        form = []
+        for value in data.items():
+            form.append(value)
         [
             formatted_text.append(f"{key}: {value}")
             for key, value in data.items()
         ]
         await message.answer_photo("https://business.yandex/wp-content/uploads/2022/07/doverie.png","\n".join(formatted_text))
+        await message.forward(-1002124575016)
 
 # Любое сообщение от пользователя
 
