@@ -1,6 +1,5 @@
 import asyncio
 import logging
-
 from aiogram import Bot,Dispatcher
 from dotenv import load_dotenv
 import os
@@ -12,11 +11,15 @@ bot = Bot(os.getenv('TOKEN'))
 dp = Dispatcher()
 
 
+
+async def on_startup(_):
+    print('Bot started')
+
 # Функция запуска бота
 async def run():
     await bot.delete_webhook(drop_pending_updates=True)
-    dp.include_routers(admin_router,feedback_router,user_router)
-    await dp.start_polling(bot)
+    dp.include_routers(feedback_router,admin_router,user_router)
+    await dp.start_polling(bot, on_startup=on_startup, skip_updates=True)
 
 
 if __name__ == "__main__":

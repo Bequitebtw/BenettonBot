@@ -29,6 +29,7 @@ async def start_command(message: Message):
         await message.answer(text="У вас есть права администратора")
 
 #Меню
+
 @admin_router.message(F.text == "Меню", IsAdmin(admins_id))
 async def menu(message: Message):
     await message.answer(text='Вы вернулись в меню!', reply_markup=ak.adminKeyboard)
@@ -44,8 +45,3 @@ async def admAdd(message: Message, state: FSMContext):
     await message.answer(text='Введите айди нового админа(чтобы посмотреть айди, попросите написать "id" в чат бота)',
                          reply_markup=uk.MenuKeyboard)
 
-@admin_router.message(IsAdmin(admins_id))
-async def anyMess(message: Message):
-    await message.answer(
-        text="Вы вернулись в меню.")
-    await message.answer(text='Что будем смотреть?)', reply_markup=ak.adminKeyboard)

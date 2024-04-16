@@ -37,9 +37,6 @@ async def fbFnc(message: Message, state: FSMContext):
         data = await state.get_data()
         await state.clear()
         formatted_text = []
-        form = []
-        for value in data.items():
-            form.append(value)
         [
             formatted_text.append(f"{key}: {value}")
             for key, value in data.items()
@@ -54,12 +51,16 @@ async def addAdm(message: Message, state: FSMContext):
     if message.text == "Меню":
         await state.clear()
         await message.answer(text='Вы вернулись в меню!', reply_markup=uk.MainButtons)
-    if message.text.isdigit() and len(message.text) == 9:
+    elif message.text.isdigit() and len(message.text) > 6:
         await state.update_data(id=int(message.text))
-        await state.set_state(AddAdmin.admId)
+        data = await state.get_data()
+        [
+        admins_id.append(value)
+        for key, value in data.items()
+        ]
         await message.answer(text='Новый админ добавлен!',reply_markup=ak.adminKeyboard)
         await state.clear()
     elif message.text == "id":
         await message.answer(f'Это ваш айди: {message.from_user.id}.Нужен того, кого вы добавляете)')
     else:
-        await message.answer(text='Айди должно составлять 9 цифр(чтобы посмотреть айди, попросите написать "id" в чат бота)')
+        await message.answer(text='Айди должен составлять более 6 цифр(чтобы посмотреть айди, попросите написать "id" в чат бота)')

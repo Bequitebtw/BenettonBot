@@ -5,11 +5,13 @@ from aiogram import Router, F
 from aiogram.types import Message
 from apps.lists import pko_list
 from apps.lists import KM3_list
+from apps.lists import pсo_list
 from contextlib import suppress
 from aiogram.fsm.context import FSMContext
 from utils.states import WriteFeedback
 from aiogram.exceptions import TelegramBadRequest
 from keyboards.user_keyboard import feedback
+from apps import database as db
 from dotenv import load_dotenv
 import os
 load_dotenv()
@@ -118,10 +120,26 @@ async def rko(message: Message):
 
 
 # ПКО /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+@user_router.callback_query(pg.Pagination.filter(F.action.in_(["next2"])))
+async def pagination_handler(call: CallbackQuery, callback_data: pg.Pagination):
+    page_num = int(callback_data.page)
+    page = page_num + 1
+    if page_num < (len(pсo_list) - 1):
+        with suppress(TelegramBadRequest):
+            image = FSInputFile(pсo_list[page][0], filename="image")
+            await call.message.answer_photo(photo=image)
+            await call.message.answer(
+                text=f"{page + 1}" f". " f"{pсo_list[page][1]}", reply_markup=pg.PcoPaginator(page))
+        await call.answer()
+    else:
+        await call.message.answer("Вы закончили обучение!", reply_markup=uk.MenuKeyboard)
+
 @user_router.message(F.text == "📝 ПКО")
 async def pko(message: Message):
     await message.answer(text='ПКО - Приходный кассовый ордер, возврат размена + выручки после смены.', reply_markup=uk.MenuKeyboard)
-
+    image = FSInputFile(pсo_list[0][0])
+    await message.answer_photo(photo=image)
+    await message.answer(f"1. {pсo_list[0][1]}", reply_markup=pg.PcoPaginator())
 # ПДК
 @user_router.message(F.text == "💳 ПДК")
 async def pdk(message: Message):
